@@ -1,14 +1,14 @@
 class UsersController < ApplicationController 
 
     def index 
-        # GET /users
+        # GET /users/
         self.render json: User.all 
     end
 
     def create 
         #POST /users
         
-        user = User.new(self.user_params)
+        user = User.new(user_params)
 
         if user.save
             render json: user
@@ -32,7 +32,7 @@ class UsersController < ApplicationController
     end
 
     def destroy 
-        user = User.find_by_id(id: self.params[:id])
+        user = User.find_by_id(self.params[:id])
         user.destroy
         render json: user 
     end
@@ -40,7 +40,12 @@ class UsersController < ApplicationController
     def update 
         user = User.find(params[:id])
         
-        if user.update(self.user_params)
+        if user_params.empty? # fix this sometime... 
+            p user.errors.full_messages << "No vaild parameters given!"
+
+            render json: user.errors.full_messages, status: :unprocessable_entity
+            
+        elsif user.update(user_params)
             render json: user 
         else
             render json: user.errors.full_messages, status: :unprocessable_entity
@@ -51,7 +56,7 @@ class UsersController < ApplicationController
 
     private 
     def user_params
-        self.params[:user].permit(:name, :email)
+        self.params[:user].permit(:username)
     end
     
 
